@@ -3,22 +3,24 @@
 curdate=`date +%Y-%m-%dT00:00:00.000Z`
 #curdate="2025-11-19T00:00:00.000Z"
 
-token=$1
-corname=$2
-action=$3
-message=$4
+host=$1
+token=$2
+corname=$3
+action=$4
+message=$5
 
-if [[ $1 == "" || $2 == "" || $3 == "" || $4 == "" ]]; then
-    echo -e "Usage:\n  $0 \"param1\" \"param2\""
-    echo -e "	'param1' is an api token"
-    echo -e "	'param2' is a correlation name of the incident"
-    echo -e "	'param3' is an action - Closed, Approved, InProgress or Resolved"
-    echo -e "	'param4' is a comment"
+if [[ $1 == "" || $2 == "" || $3 == "" || $4 == "" || $5 == "" ]]; then
+    echo -e "Usage:\n  $0 \"param1\" \"param2\" \"param3\" \"param4\" \"param5\""
+	echo -e "	'param1' is a target hostname"
+    echo -e "	'param2' is an api token"
+    echo -e "	'param3' is a correlation name of the incident"
+    echo -e "	'param4' is an action - Closed, Approved, InProgress or Resolved"
+    echo -e "	'param5' is a comment"
     exit
-elif [[ "$1" =~ " " || "$2" =~ " " ]]; then
+elif [[ "$2" =~ " " || "$3" =~ " " ]]; then
     echo "No space available in 'param1', 'param2' or 'param3'"
     exit
-elif [[ "$3" != "Closed" || "$3" != "Approved" || "$3" != "InProgress" || "$3" != "Resolved" ]]; then
+elif [[ "$4" != "Closed" || "$4" != "Approved" || "$4" != "InProgress" || "$4" != "Resolved" ]]; then
     echo "Incorrect action"
     exit
 fi
@@ -41,7 +43,7 @@ echo "Getting IDs of incidents from SIEM"
 ids=`curl -skX POST \
     -d "$json_data" \
     -H "Authorization: Bearer $token" \
-    -H "Content-Type: application/json" https://mskpsiem01.coresvc.tech/api/v2/incidents | jq -r '.incidents.[].id'`
+    -H "Content-Type: application/json" https://$host/api/v2/incidents | jq -r '.incidents.[].id'`
 
 echo "Found $(echo "$ids" | wc -l) incident(s)"
 
@@ -57,7 +59,7 @@ json_data_put=$(jq -n \
 for id in $ids; do
     inc=`curl -skX GET -H "Authorization: Bearer $token" \
               -H "Content-Type: application/json" \
-               https://mskpsiem01.coresvc.tech/api/incidentsReadModel/incidents/$id`
+               https://$host/api/incidentsReadModel/incidents/$id`
 
     key=`jq -r '.key' <<<"$inc"`
     name=`jq -r '.name' <<<"$inc"`
@@ -99,16 +101,16 @@ for id in $ids; do
         "type": $type
     }')
 
-    echo "Closing $key - https://mskpsiem01.coresvc.tech/#/incident/incidents/view/$id"
+    echo "Closing $key - https://$host/#/incident/incidents/view/$id"
     curl -skX PUT -H "Authorization: Bearer $token" \
              -H "Content-Type: application/json" \
 	     -d "$jd" \
-              https://mskpsiem01.coresvc.tech/api/incidents/$id
+              https://$host/api/incidents/$id
 
     curl -skX PUT -H "Authorization: Bearer $token" \
              -H "Content-Type: application/json" \
 	     -d "$json_data_put" \
-              https://mskpsiem01.coresvc.tech/api/incidents/$id/transitions
+              https://$host/api/incidents/$id/transitions
 
 done
 
