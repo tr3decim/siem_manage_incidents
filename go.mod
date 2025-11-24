@@ -1,3 +1,3 @@
-module 13/siem_manage_inc
+module main.go
 
 go 1.24.4
