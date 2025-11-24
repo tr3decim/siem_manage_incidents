@@ -143,7 +143,7 @@ func main() {
 func printHelp() {
 	fmt.Println("Usage:")
 	fmt.Println("  siem-tool \"param1\" \"param2\" \"param3\" \"param4\" \"param5\" \"param6\" \"param7\"")
-  fmt.Println("  'param1' is a hostname)
+  fmt.Println("  'param1' is a hostname")
   fmt.Println("  'param2' is an api token")
 	fmt.Println("  'param3' is a correlation name of the incident(s) (example: Unix_Systemd_Service_Modify)")
 	fmt.Println("  'param4' is an action (Closed, Approved, InProgress or Resolved)")
