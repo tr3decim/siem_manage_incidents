@@ -10,7 +10,7 @@ The API is used accroding to [Positive Technologies Max Patrol EULA](https://hel
 - **Batch processing**: Handle multiple incidents at once
 
 ## Build from source
-1. Pull soruce files
+1. Pull source files
 2. Run `go build -o siem-tool main.go`
 
 ## Installation
