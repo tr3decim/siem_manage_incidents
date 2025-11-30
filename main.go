@@ -185,7 +185,7 @@ func getIncidentIDs(token, where string, limit int, curdate string) ([]string, e
     return ids, nil
 }
 
-func getIncidentDetails(token, id string) ( *IncidentDetail, error) {
+func getIncidentDetails(token, id string) (*IncidentDetail, error) {
     req, err := http.NewRequest("GET", host + incidentDetailsAPIpath + id, nil)
     if err != nil {
         return nil, fmt.Errorf("failed to create request: %v", err)
@@ -194,7 +194,7 @@ func getIncidentDetails(token, id string) ( *IncidentDetail, error) {
     req.Header.Set("Authorization", "Bearer " + token)
     req.Header.Set("Content-Type", "application/json")
 
-    client :=  &http.Client{}
+    client := &http.Client{}
     resp, err := client.Do(req)
     if err != nil {
         return nil, fmt.Errorf("failed to execute request: %v", err)
@@ -215,7 +215,7 @@ func getIncidentDetails(token, id string) ( *IncidentDetail, error) {
 }
 
 func updateIncident(token, id string, incident *IncidentDetail, assigned string) error {
-    updateData := IncidentUpdate{
+    updateData := IncidentUpdate {
         Assigned:    assigned,
         Attackers:   convertTargetsDetailToTargets(incident.Attackers),
         Description: incident.Description,
@@ -243,7 +243,7 @@ func updateIncident(token, id string, incident *IncidentDetail, assigned string)
     req.Header.Set("Authorization", "Bearer " + token)
     req.Header.Set("Content-Type", "application/json")
 
-    client :=  &http.Client{}
+    client := &http.Client{}
     resp, err := client.Do(req)
     if err != nil {
         return fmt.Errorf("failed to execute update request: %v", err)
@@ -356,7 +356,7 @@ func main() {
     }
 
     if *todo == "" || *token == "" || *hostname == "" {
-        fmt.Println("Error: Missing required arguments ( --do, --token or --host)\n")
+        fmt.Println("Error: Missing required arguments (--do, --token or --host)\n")
         flag.Usage()
         os.Exit(1)
     }
@@ -384,11 +384,11 @@ func main() {
          *curdate = time.Now().UTC().Truncate(24*time.Hour).Format("2006-01-02T15:04:05.000Z")
     }
 
-    http.DefaultTransport.(*http.Transport).TLSClientConfig =  & tls.Config{InsecureSkipVerify: true}
+    http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 
     where := ""
 
-    if strings.Contains( *corname, ", ") {
+    if strings.Contains(*corname, ", ") {
         whereConditions := strings.Split(*corname, ", ")
 
         for _, whereCondition := range whereConditions {
@@ -404,7 +404,7 @@ func main() {
         }
 
         where += fmt.Sprintf(" AND status = '%s'", *whereStatus)
-    } else if *corname != " * " {
+    } else if *corname != "*" {
         if strings.Contains(*corname, "INC") {
             where += fmt.Sprintf("key = '%s'", *corname)
         } else {
@@ -430,7 +430,7 @@ func main() {
         fmt.Printf("Found %v incident(s) from %v\n", len(ids), fromDate.Format("January 02, 2006 at 15:04:05"))
 
         for _, id := range ids {
-            incident, err := getIncidentDetails( *token, id)
+            incident, err := getIncidentDetails(*token, id)
             if err != nil {
                 fmt.Printf("failed to get incident details: %v", err)
             } else {
